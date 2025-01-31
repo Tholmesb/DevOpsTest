@@ -44,4 +44,38 @@ This README details how to deploy the infrastructure on GCP, perform the databas
    The `schema/migrations.sql` file contains the creation of the `users` table and the insertion of sample data.
 
 2. **Running the Migration**
-   - Connect to the PostgreSQL instance (using the priva
+   - Connect to the PostgreSQL instance (using the private IP or the Cloud SQL Proxy).
+   - Run the script directly:
+     ```bash
+     psql "host=<PRIVATE_DB_IP> user=postgres_user dbname=users_db password=YOUR_DB_PASSWORD" -f ./schema/migrations.sql
+     ```
+   - Verify that the `users` table was created and that the sample records are present.
+
+---
+
+## 3. API Usage
+
+1. **Main Endpoint**  
+   - The API provides a `GET /users` endpoint that returns a list of users in the table.
+
+2. **Check the URL**  
+   - After deployment, Terraform outputs the `cloud_run_url`.
+   - Access it via your browser or a tool like `curl`:
+     ```bash
+     curl https://<CLOUD_RUN_URL>/users
+     ```
+   - You should receive a JSON list with the users inserted during the migration.
+
+3. **Health Check Endpoint (Optional)**  
+   - You can also use `GET /` to see a confirmation message that the API is running:
+     ```bash
+     curl https://<CLOUD_RUN_URL>/
+     ```
+
+---
+
+## 4. Resource Cleanup
+
+- To destroy all resources created by Terraform, run:
+  ```bash
+  terraform destroy -var-file="terraform.tfvars"
